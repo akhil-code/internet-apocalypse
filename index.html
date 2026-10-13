@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Internet Apocalypse</title>
+  <link rel="icon" href="data:,">
+  <style>
+    html, body { margin: 0; height: 100%; background: #03050f; }
+    body { --bar: 0px; }
+    body.dev { --bar: 36px; }
+    body {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow: hidden; font: bold 13px "Courier New", monospace; color: #7d86c7;
+    }
+    .dev-bar { height: 36px; display: none; align-items: center; gap: 8px; }
+    .dev .dev-bar { display: flex; }
+    .level-nav {
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px; z-index: 2;
+      flex-wrap: wrap; justify-content: center; width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box;
+      padding: 6px 10px; border-radius: 6px; background: rgba(7, 11, 36, 0.8);
+    }
+    .level-nav button, .level-nav a {
+      font: inherit; color: #e8f6ff; background: #0f1745; cursor: pointer;
+      border: 1px solid #29f0ff; border-radius: 4px; padding: 6px 12px;
+    }
+    .level-nav button, .level-nav a { white-space: nowrap; }
+    .level-nav a { text-decoration: none; border-color: #b14cff; }
+    .level-nav button:hover, .level-nav a:hover { background: #1b2a7a; }
+    .level-nav button.on { color: #070b24; background: #ffe066; border-color: #ffe066; }
+    .level-nav span { color: #29f0ff; min-width: 90px; text-align: center; }
+    .dev-bar select {
+      font: inherit; color: #e8f6ff; background: #0f1745;
+      border: 1px solid #b14cff; border-radius: 4px; padding: 3px 6px;
+    }
+    canvas {
+      display: block;
+      width: min(100vw, calc((100vh - var(--bar)) * 16 / 9));
+      height: auto;
+      aspect-ratio: 16 / 9;
+      background: #070b24;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+  <div class="dev-bar">
+    <label for="start-point">START AT</label>
+    <select id="start-point">
+      <option value="" selected disabled>pick a year…</option>
+      <option value="year:2010">2010 · run</option>
+      <option value="year:2011">2011 · run</option>
+      <option value="year:2012">2012 · run</option>
+      <option value="year:2013">2013 · run</option>
+      <option value="boss:2013">2013 · Boss v1.0</option>
+      <option value="year:2014">2014 · run</option>
+      <option value="year:2015">2015 · run</option>
+      <option value="year:2016">2016 · run</option>
+      <option value="year:2017">2017 · run</option>
+      <option value="boss:2017">2017 · Boss v2.0</option>
+      <option value="year:2018">2018 · run</option>
+      <option value="year:2019">2019 · run</option>
+      <option value="year:2020">2020 · run</option>
+      <option value="year:2021">2021 · run</option>
+      <option value="boss:2021">2021 · Boss v3.0</option>
+      <option value="year:2022">2022 · run</option>
+      <option value="year:2023">2023 · run</option>
+      <option value="year:2024">2024 · run</option>
+      <option value="year:2025">2025 · run</option>
+      <option value="year:2026">2026 · run</option>
+      <option value="boss:2026">2026 · Boss FINAL</option>
+      <option value="boss:2026:p2">2026 · Boss phase 2</option>
+      <option value="boss:2026:p3">2026 · Boss phase 3 (Blue Screen)</option>
+    </select>
+  </div>
+  <canvas id="game" width="960" height="540"></canvas>
+  <!-- Demo controls: skip to the previous/next level (also [ and ] on the keyboard) -->
+  <div class="level-nav">
+    <button id="prev-level" title="Previous level ( [ )">◀ PREV</button>
+    <span id="level-name">TITLE</span>
+    <button id="next-level" title="Next level ( ] )">NEXT ▶</button>
+    <button id="auto-fire" title="Toggle auto fire ( F )">AUTO FIRE: ON</button>
+    <a href="https://github.com/akhil-code/internet-apocalypse" target="_blank" rel="noopener" title="Source code on GitHub">GITHUB ↗</a>
+  </div>
+  <!-- timeline.js holds the real incidents; without it story.js uses a built-in timeline -->
+  <script src="timeline.js" onerror="console.info('timeline.js not found: using the built-in timeline')"></script>
+  <script src="story.js"></script>
+  <script src="game.js"></script>
+  <script>
+    (() => {
+      for (const [id, delta] of [['prev-level', -1], ['next-level', 1]]) {
+        const btn = document.getElementById(id);
+        btn.addEventListener('click', () => { window.jumpLevel(delta); btn.blur(); }); // blur so Space doesn't re-press it
+      }
+      const fire = document.getElementById('auto-fire');
+      fire.addEventListener('click', () => { window.toggleAutoFire(); fire.blur(); });
+      const label = document.getElementById('level-name');
+      setInterval(() => {
+        label.textContent = window.currentLevelName();
+        const on = window.isAutoFire(); // also changes with the F key, so keep the button in sync
+        fire.textContent = `AUTO FIRE: ${on ? 'ON' : 'OFF'}`;
+        fire.classList.toggle('on', on);
+      }, 200);
+    })();
+  </script>
+</body>
+</html>
